@@ -3,9 +3,10 @@ var fs = require('fs');
 var qs = require('querystring');
 const url = require('url');
 var status = 0;
-var allData = '';
-var storeData = '';
+
 http.createServer(function (req, res) {
+    var allData = '';
+    var storeData = '';
     var query = req.url.split('=')[1];
     console.log(req.url)
     switch (req.method) {
@@ -29,27 +30,18 @@ http.createServer(function (req, res) {
 
     res.writeHead(200);
     if (req.method === 'GET') {
-        if (req.url === '/checkstatus') {
-            res.end(status.toString());
-            return;
-        }
-        fs.createReadStream('filechooser.html').pipe(res);
+        fs.createReadStream('upload.html').pipe(res);
     }
     else if (req.method === 'POST') {
-        allData;
-        status = 0;
-        var outputFile = fs.createWriteStream('output');
-        var total = req.headers['content-length'];
-        var progress = 0;
+        allData = '';
+        var outputFile = fs.createWriteStream('uploadedData');
 
         req.on('data', function (chunk) {
-            progress += chunk.length;
+            allData = '';
             var textChunk = chunk.toString('utf8');
-            var perc = parseInt((progress / total) * 100);
             allData += textChunk.split("Content-Type: text/plain")[1].split('------')[0];
             res.write("<h1 style='text-align:center'>File Uploaded</h1><p>" + allData + "</p>");
             console.log('chunkkkkk', allData.split('------')[0]);
-            status = perc;
         });
         req.pipe(outputFile);
 
